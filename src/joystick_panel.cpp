@@ -17,7 +17,7 @@
 
 #include <geometry_msgs/msg/twist.hpp>
 
-#include "test_panel/joystick_panel.hpp"
+#include "include/test_panel/joystick_panel.hpp"
 
 namespace test_panel {
 
