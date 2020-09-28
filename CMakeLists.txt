@@ -68,7 +68,8 @@ ament_export_dependencies(
 )
 
 install(FILES plugin_description.xml
-  DESTINATION share/${PROJECT_NAME})
+  DESTINATION share/${PROJECT_NAME}
+)
 
 install(
   TARGETS ${PROJECT_NAME}

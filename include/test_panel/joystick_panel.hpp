@@ -13,8 +13,10 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 
 class QLineEdit;
+class QCheckBox;
 
 namespace test_panel {
 
@@ -51,9 +53,9 @@ namespace test_panel {
              * A public method for others building on this panel
              * to set the topic name at which to publish the Twist msg.
              *
-             * @param topic a Q string representing the topic name
+             * @param topic a string representing the topic name
              */
-            void setTopic(const QString& topic);
+            void setTopic(const std::string& topic);
 
             /*
              * A public method for others building on this panel
@@ -127,15 +129,20 @@ namespace test_panel {
         protected:
             // Panel vars
             JoystickWidget* joystick_widget_;
-            QLineEdit* topic_editor_;
-            QLineEdit* max_translational_velocity_editor_;
-            QLineEdit* max_rotational_velocity_editor_;
-            QString topic_;
+            QLineEdit* topic_gui_;
+            QLineEdit* max_translational_velocity_gui_;
+            QLineEdit* max_rotational_velocity_gui_;
+            QCheckBox* return_to_zero_gui_;
+            std::string topic_;
             float max_translational_velocity_;
             float max_rotational_velocity_;
             float translational_velocity_;
             float rotational_velocity_;
-            bool return_to_zero_;          
+            bool return_to_zero_;
+
+            // ROS2 vars
+            std::shared_ptr<rclcpp::Node> node_;
+            std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::Twist>> twist_publisher_;
     };
 }
 
