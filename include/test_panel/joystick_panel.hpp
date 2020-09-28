@@ -22,11 +22,10 @@ namespace test_panel {
 
     class JoystickWidget;
 
-    /**
-     * \class JoystickPanel
-     * 
+    /*
+     * Defines the panel.
      */
-    class JoystickPanel : public rviz_common::Panel {
+    class JoystickPanel: public rviz_common::Panel {
         Q_OBJECT
 
         public:
@@ -134,10 +133,10 @@ namespace test_panel {
             QLineEdit* max_rotational_velocity_gui_;
             QCheckBox* return_to_zero_gui_;
             std::string topic_;
-            float max_translational_velocity_;
-            float max_rotational_velocity_;
-            float translational_velocity_;
-            float rotational_velocity_;
+            float max_translational_velocity_; // m/s
+            float max_rotational_velocity_; // rad/s
+            float translational_velocity_; // m/s
+            float rotational_velocity_; // rad/s
             bool return_to_zero_;
 
             // ROS2 vars

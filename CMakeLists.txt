@@ -31,7 +31,9 @@ link_directories(${ament_cmake_LIBRARY_DIRS})
 add_definitions(-DQT_NO_KEYWORDS)
 
 add_library(${PROJECT_NAME} SHARED
+  include/${PROJECT_NAME}/joystick_widget.hpp
   include/${PROJECT_NAME}/joystick_panel.hpp
+  src/joystick_widget.cpp
   src/joystick_panel.cpp
   ${MOC_FILES}
 )

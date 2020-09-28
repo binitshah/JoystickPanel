@@ -19,6 +19,7 @@
 
 
 #include "include/test_panel/joystick_panel.hpp"
+#include "include/test_panel/joystick_widget.hpp"
 
 namespace test_panel {
 
@@ -50,7 +51,7 @@ namespace test_panel {
         // return_to_zero_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
 
         QVBoxLayout* panel_layout = new QVBoxLayout;
-        panel_layout->addWidget(new QLabel("Use arrow keys. Press 'space' to stop."));
+        panel_layout->addWidget(new QLabel("Use arrow keys or mouse. Press 'space' to stop."));
         panel_layout->addLayout(topic_layout);
         panel_layout->addLayout(max_vels_layout);
         panel_layout->addWidget(return_to_zero_gui_);
@@ -77,7 +78,6 @@ namespace test_panel {
                 setTopic(topic.toStdString());
             }
         }
-        // if (config.mapGet)
     }
 
     void JoystickPanel::save(rviz_common::Config config) const {
