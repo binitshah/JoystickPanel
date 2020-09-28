@@ -4,15 +4,22 @@
   <name>test_panel</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="bshah@gatech.edu">binitshah</maintainer>
+  <maintainer email="bshah@ieee.org">binitshah</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>rviz_common</depend>
+  <depend>libqt5-widgets</depend>
+  <depend>rviz2</depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
   <export>
+    <rviz plugin="plugin_description.xml"/>
     <build_type>ament_cmake</build_type>
   </export>
 </package>
