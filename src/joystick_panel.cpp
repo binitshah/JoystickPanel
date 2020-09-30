@@ -8,7 +8,10 @@
  * This library is licensed under the MIT License
  **********************************************************************************************/
 
-#include <stdio.h>
+#include "include/test_panel/joystick_panel.hpp"
+#include "include/test_panel/joystick_widget.hpp"
+
+#include <iostream>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QHBoxLayout>
@@ -18,19 +21,17 @@
 #include <QString>
 
 
-#include "include/test_panel/joystick_panel.hpp"
-#include "include/test_panel/joystick_widget.hpp"
-
 namespace test_panel {
 
     JoystickPanel::JoystickPanel(QWidget* parent) :
-        Panel(parent), topic_("/cmd_vel"), max_translational_velocity_(5.0), max_rotational_velocity_(3.0),
-        translational_velocity_(0.0), rotational_velocity_(0.0), return_to_zero_(true) {
+        Panel(parent), topic_("/cmd_vel") {
         // Setup ROS2 functionality
         node_ = rclcpp::Node::make_shared("joystick_panel");
         twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
 
         // Layout the panel
+        joystick_widget_ = new JoystickWidget;
+
         QHBoxLayout* topic_layout = new QHBoxLayout;
         topic_layout->addWidget(new QLabel("Topic: "));
         topic_gui_ = new QLineEdit;
@@ -40,11 +41,12 @@ namespace test_panel {
         QHBoxLayout* max_vels_layout = new QHBoxLayout;
         max_vels_layout->addWidget(new QLabel("Max Lin (m/s): "));
         max_translational_velocity_gui_ = new QLineEdit;
-        max_translational_velocity_gui_->setText(QString::number(max_translational_velocity_, 'f', 2));
+        // TODO: get vels from widget
+        // max_translational_velocity_gui_->setText(QString::number(max_translational_velocity_, 'f', 2));
         max_vels_layout->addWidget(max_translational_velocity_gui_);
         max_vels_layout->addWidget(new QLabel("Max Ang (rad/s): "));
         max_rotational_velocity_gui_ = new QLineEdit;
-        max_rotational_velocity_gui_->setText(QString::number(max_rotational_velocity_, 'f', 2));
+        // max_rotational_velocity_gui_->setText(QString::number(max_rotational_velocity_, 'f', 2));
         max_vels_layout->addWidget(max_rotational_velocity_gui_);
 
         return_to_zero_gui_ = new QCheckBox("Return to Zero");
@@ -52,6 +54,7 @@ namespace test_panel {
 
         QVBoxLayout* panel_layout = new QVBoxLayout;
         panel_layout->addWidget(new QLabel("Use arrow keys or mouse. Press 'space' to stop."));
+        panel_layout->addWidget(joystick_widget_);
         panel_layout->addLayout(topic_layout);
         panel_layout->addLayout(max_vels_layout);
         panel_layout->addWidget(return_to_zero_gui_);
@@ -69,7 +72,6 @@ namespace test_panel {
     }
 
     void JoystickPanel::load(const rviz_common::Config& config) {
-        std::cout << "loading" << std::endl;
         Panel::load(config);
         QString topic;
         if (config.mapGetString("Topic", &topic)) {
@@ -91,8 +93,8 @@ namespace test_panel {
 
     void JoystickPanel::publishVelocities() {
         geometry_msgs::msg::Twist msg;
-        msg.linear.x = translational_velocity_;
-        msg.angular.z = rotational_velocity_;
+        // msg.linear.x = translational_velocity_;
+        // msg.angular.z = rotational_velocity_;
         twist_publisher_->publish(msg);
     }
 
@@ -100,41 +102,25 @@ namespace test_panel {
         setTopic(topic_gui_->text().toStdString());
     }
 
-    void JoystickPanel::updateVelocities(float translational_velocity, float rotational_velocity) {
-        translational_velocity_ = translational_velocity;
-        rotational_velocity_ = rotational_velocity;
-    }
-
     void JoystickPanel::updateMaxTranslationalVelocity() {
         // TODO
+        // joystick_widget_.setMaxVelocities()
     }
 
     void JoystickPanel::updateMaxRotationalVelocity() {
-        // TODO
+        // TODO: how to read float
+        // joystick_widget_.setMaxVelocities()
     }
 
     void JoystickPanel::updateReturnToZero() {
-        // TODO
+        // TODO: how to read checkbox
+        // joystick_widget_.setReturnToZero()
     }
 
     void JoystickPanel::setTopic(const std::string& topic) {
         if (topic != "") {
             topic_ = topic; // TODO: handle changing publisher to new topic
         }
-    }
-
-    void JoystickPanel::setMaxVelocities(float max_translational_velocity, float max_rotational_velocity) {
-        max_translational_velocity_ = max_translational_velocity;
-        max_rotational_velocity_ = max_rotational_velocity;
-    }
-
-    void JoystickPanel::setVelocities(float translational_velocity, float rotational_velocity) {
-        translational_velocity_ = translational_velocity;
-        rotational_velocity_ = rotational_velocity;
-    }
-
-    void JoystickPanel::setReturnToZero(bool return_to_zero) {
-        std::cout << "return_to_zero: " << return_to_zero << std::endl;
     }
 }
 

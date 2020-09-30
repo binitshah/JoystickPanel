@@ -33,7 +33,41 @@ namespace test_panel {
 
             virtual QSize sizeHint() const { return QSize( 150, 150 ); }
 
+            /*
+             * TODO: A public method for others building on this panel
+             * to set the vels which will be published in the Twist msg.
+             */
+            void getVelocities();
+
+            /*
+             * A public method for others building on this panel
+             * to set the maximum vels that the joystick widget can
+             * reach set for publishing in the Twist msg.
+             *
+             * @param max_translational_velocity maximum linear vel in m/s
+             * @param max_rotational_velocity    maximum angular vel in rad/s
+             */
+            void setMaxVelocities(float max_translational_velocity, float max_rotational_velocity);
+
+            /*
+             * A public method for others building on this panel
+             * to set whether the joystick widget returns to
+             * zero after being released.
+             *
+             * @param return_to_zero_ whether or not to go to zero
+             */
+            void setReturnToZero(bool return_to_zero);
+
+        protected Q_SLOTS:
+            void calculateVelocities();
+
         protected:
+            virtual void processMouse(QPoint P);
+
+            QPoint pos_;
+            bool mouse_pressed_;
+            bool return_to_zero_;
+            QPoint last_error_;
             float max_translational_velocity_; // m/s
             float max_rotational_velocity_; // rad/s
             float translational_velocity_; // m/s

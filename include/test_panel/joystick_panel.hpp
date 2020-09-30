@@ -56,34 +56,6 @@ namespace test_panel {
              */
             void setTopic(const std::string& topic);
 
-            /*
-             * A public method for others building on this panel
-             * to set the maximum vels that the joystick widget can
-             * reach set for publishing in the Twist msg.
-             *
-             * @param max_translational_velocity maximum linear vel in m/s
-             * @param max_rotational_velocity    maximum angular vel in rad/s
-             */
-            void setMaxVelocities(float max_translational_velocity, float max_rotational_velocity);
-
-            /*
-             * A public method for others building on this panel
-             * to set the vels which will be published in the Twist msg.
-             *
-             * @param translational_velocity linear vel in m/s
-             * @param rotational_velocity    angular vel in rad/s
-             */
-            void setVelocities(float translational_velocity, float rotational_velocity);
-
-            /*
-             * A public method for others building on this panel
-             * to set whether the joystick widget returns to
-             * zero after being released.
-             *
-             * @param return_to_zero whether or not to go to zero
-             */
-            void setReturnToZero(bool return_to_zero);
-
         protected Q_SLOTS:
 
             /*
@@ -97,15 +69,6 @@ namespace test_panel {
              * which to publish the Twist msg.
              */
             void updateTopic();
-
-            /*
-             * The joystick GUI's callback for updating the vels
-             * which will be published in the Twist msg.
-             *
-             * @param translational_velocity linear vel in m/s
-             * @param rotational_velocity    angular vel in rad/s
-             */
-            void updateVelocities(float translational_velocity, float rotational_velocity);
 
             /*
              * The GUI's callback for updating the max rotational
@@ -133,11 +96,6 @@ namespace test_panel {
             QLineEdit* max_rotational_velocity_gui_;
             QCheckBox* return_to_zero_gui_;
             std::string topic_;
-            float max_translational_velocity_; // m/s
-            float max_rotational_velocity_; // rad/s
-            float translational_velocity_; // m/s
-            float rotational_velocity_; // rad/s
-            bool return_to_zero_;
 
             // ROS2 vars
             std::shared_ptr<rclcpp::Node> node_;
