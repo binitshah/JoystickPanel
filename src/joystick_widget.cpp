@@ -23,7 +23,7 @@ namespace test_panel {
 
     JoystickWidget::JoystickWidget(QWidget* parent) :
         QWidget(parent), max_translational_velocity_(5.0), max_rotational_velocity_(2.0),
-        translational_velocity_(0.0), rotational_velocity_(0.0),
+        translational_velocity_(1.3), rotational_velocity_(0.0),
         mouse_pressed_(false), return_to_zero_(true) {
         QTimer* calculation_timer = new QTimer(this);
         connect(calculation_timer, SIGNAL(timeout()), this, SLOT(calculateVelocities()));
@@ -42,7 +42,7 @@ namespace test_panel {
 
             int currx_error = pos_.x() - boundary.center().x();
             int curry_error = pos_.y() - boundary.center().y();
-            if ((std::abs(currx_error) + std::abs(curry_error)) > 10) {
+            if ((std::abs(currx_error) + std::abs(curry_error)) > 8) {
                 if (last_error_.x() == 0.0 && last_error_.y() == 0.0) {
                     last_error_ = QPoint(currx_error, curry_error);
                 }
@@ -57,7 +57,7 @@ namespace test_panel {
             update();
         }
 
-
+        std::cout << "return_to_zero: " << return_to_zero_ << " max_translational_velocity: " << max_translational_velocity_ << " max_rotational_velocity: " << max_rotational_velocity_ << std::endl;
     }
 
     void JoystickWidget::paintEvent(QPaintEvent* event) {
@@ -131,6 +131,10 @@ namespace test_panel {
         update();
     }
 
+    void JoystickWidget::mouseReleaseEvent(QMouseEvent* event) {
+        mouse_pressed_ = false;
+    }
+
     void JoystickWidget::processMouse(QPoint P) {
         int boundary_width = width();
         int boundary_height = height();
@@ -153,16 +157,12 @@ namespace test_panel {
         }
     }
 
-    void JoystickWidget::mouseReleaseEvent(QMouseEvent* event) {
-        mouse_pressed_ = false;
+    std::tuple<float, float> JoystickWidget::getVelocities() {
+        return std::make_tuple(translational_velocity_, rotational_velocity_);
     }
 
-    void JoystickWidget::leaveEvent(QEvent* event) {
-
-    }
-
-    void JoystickWidget::getVelocities() {
-        // TODO: how to use tuples again?
+    std::tuple<float, float> JoystickWidget::getMaxVelocities() {
+        return std::make_tuple(max_translational_velocity_, max_rotational_velocity_);
     }
 
     void JoystickWidget::setMaxVelocities(float max_translational_velocity, float max_rotational_velocity) {
@@ -172,5 +172,9 @@ namespace test_panel {
 
     void JoystickWidget::setReturnToZero(bool return_to_zero) {
         return_to_zero_ = return_to_zero;
+    }
+
+    bool JoystickWidget::getReturnToZero() {
+        return return_to_zero_;
     }
 }

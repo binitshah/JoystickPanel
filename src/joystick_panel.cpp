@@ -31,6 +31,8 @@ namespace test_panel {
 
         // Layout the panel
         joystick_widget_ = new JoystickWidget;
+        auto max_vels = joystick_widget_->getMaxVelocities();
+        bool is_return_to_zero = joystick_widget_->getReturnToZero();
 
         QHBoxLayout* topic_layout = new QHBoxLayout;
         topic_layout->addWidget(new QLabel("Topic: "));
@@ -41,15 +43,15 @@ namespace test_panel {
         QHBoxLayout* max_vels_layout = new QHBoxLayout;
         max_vels_layout->addWidget(new QLabel("Max Lin (m/s): "));
         max_translational_velocity_gui_ = new QLineEdit;
-        // TODO: get vels from widget
-        // max_translational_velocity_gui_->setText(QString::number(max_translational_velocity_, 'f', 2));
+        max_translational_velocity_gui_->setText(QString::number(std::get<0>(max_vels), 'f', 2));
         max_vels_layout->addWidget(max_translational_velocity_gui_);
         max_vels_layout->addWidget(new QLabel("Max Ang (rad/s): "));
         max_rotational_velocity_gui_ = new QLineEdit;
-        // max_rotational_velocity_gui_->setText(QString::number(max_rotational_velocity_, 'f', 2));
+        max_rotational_velocity_gui_->setText(QString::number(std::get<1>(max_vels), 'f', 2));
         max_vels_layout->addWidget(max_rotational_velocity_gui_);
 
         return_to_zero_gui_ = new QCheckBox("Return to Zero");
+        return_to_zero_gui_->setChecked(is_return_to_zero);
         // return_to_zero_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
 
         QVBoxLayout* panel_layout = new QVBoxLayout;
@@ -66,6 +68,7 @@ namespace test_panel {
         connect(topic_gui_, SIGNAL(editingFinished()), this, SLOT(updateTopic()));
         connect(max_translational_velocity_gui_, SIGNAL(editingFinished()), this, SLOT(updateMaxTranslationalVelocity()));
         connect(max_rotational_velocity_gui_, SIGNAL(editingFinished()), this, SLOT(updateMaxRotationalVelocity()));
+        connect(return_to_zero_gui_, SIGNAL(toggled(bool)), this, SLOT(updateReturnToZero()));
         connect(publish_timer, SIGNAL(timeout()), this, SLOT(publishVelocities()));
 
         publish_timer->start(100); // 0.1 seconds
@@ -93,8 +96,9 @@ namespace test_panel {
 
     void JoystickPanel::publishVelocities() {
         geometry_msgs::msg::Twist msg;
-        // msg.linear.x = translational_velocity_;
-        // msg.angular.z = rotational_velocity_;
+        auto vels = joystick_widget_->getVelocities();
+        msg.linear.x = std::get<0>(vels);
+        msg.angular.z = std::get<1>(vels);
         twist_publisher_->publish(msg);
     }
 
@@ -113,13 +117,14 @@ namespace test_panel {
     }
 
     void JoystickPanel::updateReturnToZero() {
-        // TODO: how to read checkbox
-        // joystick_widget_.setReturnToZero()
+        std::cout << return_to_zero_gui_->isChecked() << std::endl;
+        joystick_widget_->setReturnToZero(return_to_zero_gui_->isChecked());
     }
 
     void JoystickPanel::setTopic(const std::string& topic) {
         if (topic != "") {
-            topic_ = topic; // TODO: handle changing publisher to new topic
+            topic_ = topic;
+            twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
         }
     }
 }

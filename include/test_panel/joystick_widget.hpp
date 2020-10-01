@@ -29,15 +29,28 @@ namespace test_panel {
             virtual void mouseMoveEvent(QMouseEvent* event);
             virtual void mousePressEvent(QMouseEvent* event);
             virtual void mouseReleaseEvent(QMouseEvent* event);
-            virtual void leaveEvent(QEvent* event);
-
             virtual QSize sizeHint() const { return QSize( 150, 150 ); }
 
             /*
              * TODO: A public method for others building on this panel
              * to set the vels which will be published in the Twist msg.
              */
-            void getVelocities();
+            std::tuple<float, float> getVelocities();
+
+            /*
+             * TODO: A public method for others building on this panel
+             * to set the vels which will be published in the Twist msg.
+             */
+            std::tuple<float, float> getMaxVelocities();
+
+            /*
+             * TODO: A public method for others building on this panel
+             * to set whether the joystick widget returns to
+             * zero after being released.
+             *
+             * @param return_to_zero_ whether or not to go to zero
+             */
+            bool getReturnToZero();
 
             /*
              * A public method for others building on this panel
