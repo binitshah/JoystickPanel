@@ -13,7 +13,7 @@
 
 #include <QWidget>
 
-namespace test_panel {
+namespace joystick_panel {
 
     /*
      * Defines the widget.
@@ -32,23 +32,21 @@ namespace test_panel {
             virtual QSize sizeHint() const { return QSize( 150, 150 ); }
 
             /*
-             * TODO: A public method for others building on this panel
+             * A public method for others building on this panel
              * to set the vels which will be published in the Twist msg.
              */
             std::tuple<float, float> getVelocities();
 
             /*
-             * TODO: A public method for others building on this panel
+             * A public method for others building on this panel
              * to set the vels which will be published in the Twist msg.
              */
             std::tuple<float, float> getMaxVelocities();
 
             /*
-             * TODO: A public method for others building on this panel
+             * A public method for others building on this panel
              * to set whether the joystick widget returns to
              * zero after being released.
-             *
-             * @param return_to_zero_ whether or not to go to zero
              */
             bool getReturnToZero();
 
@@ -58,9 +56,19 @@ namespace test_panel {
              * reach set for publishing in the Twist msg.
              *
              * @param max_translational_velocity maximum linear vel in m/s
-             * @param max_rotational_velocity    maximum angular vel in rad/s
+             * @return bool whether param is valid
              */
-            void setMaxVelocities(float max_translational_velocity, float max_rotational_velocity);
+            bool setMaxTransVelocities(float max_translational_velocity);
+
+            /*
+             * A public method for others building on this panel
+             * to set the maximum vels that the joystick widget can
+             * reach set for publishing in the Twist msg.
+             *
+             * @param max_rotational_velocity    maximum angular vel in rad/s
+             * @return bool whether param is valid
+             */
+            bool setMaxRotVelocities(float max_rotational_velocity);
 
             /*
              * A public method for others building on this panel

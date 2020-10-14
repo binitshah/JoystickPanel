@@ -9,7 +9,7 @@
  **********************************************************************************************/
 
 
-#include "include/test_panel/joystick_widget.hpp"
+#include "include/joystick_panel/joystick_widget.hpp"
 
 #include <iostream>
 #include <math.h>
@@ -19,11 +19,11 @@
 #include <QTimer>
 
 
-namespace test_panel {
+namespace joystick_panel {
 
     JoystickWidget::JoystickWidget(QWidget* parent) :
         QWidget(parent), max_translational_velocity_(5.0), max_rotational_velocity_(2.0),
-        translational_velocity_(1.3), rotational_velocity_(0.0),
+        translational_velocity_(0.0), rotational_velocity_(0.0),
         mouse_pressed_(false), return_to_zero_(true) {
         QTimer* calculation_timer = new QTimer(this);
         connect(calculation_timer, SIGNAL(timeout()), this, SLOT(calculateVelocities()));
@@ -31,15 +31,17 @@ namespace test_panel {
     }
 
     void JoystickWidget::calculateVelocities() {
-        if (!mouse_pressed_ && return_to_zero_) {
-            // Calculate widget boundary
-            int boundary_width = width();
-            int boundary_height = height();
-            int boundary_size = std::min(boundary_width, boundary_height) - 1;
-            int boundary_hpad = (boundary_width - boundary_size) / 2;
-            int boundary_vpad = (boundary_height - boundary_size) / 2;
-            QRect boundary(boundary_hpad, boundary_vpad, boundary_size, boundary_size);
+        // Calculate widget boundary, TODO: do only once
+        int boundary_width = width();
+        int boundary_height = height();
+        int boundary_size = std::min(boundary_width, boundary_height) - 1;
+        int boundary_hpad = (boundary_width - boundary_size) / 2;
+        int boundary_vpad = (boundary_height - boundary_size) / 2;
+        QRect boundary(boundary_hpad, boundary_vpad, boundary_size, boundary_size);
+        int inner_radius = boundary_size / 6;
+        int outer_radius = boundary_size / 2 - inner_radius / 2;
 
+        if (!mouse_pressed_ && return_to_zero_) {
             int currx_error = pos_.x() - boundary.center().x();
             int curry_error = pos_.y() - boundary.center().y();
             if ((std::abs(currx_error) + std::abs(curry_error)) > 8) {
@@ -57,7 +59,8 @@ namespace test_panel {
             update();
         }
 
-        std::cout << "return_to_zero: " << return_to_zero_ << " max_translational_velocity: " << max_translational_velocity_ << " max_rotational_velocity: " << max_rotational_velocity_ << std::endl;
+        rotational_velocity_ = ((pos_.x() - boundary.center().x()) / (float)outer_radius) * max_rotational_velocity_;
+        translational_velocity_ = (-(pos_.y() - boundary.center().y()) / (float)outer_radius) * max_translational_velocity_;
     }
 
     void JoystickWidget::paintEvent(QPaintEvent* event) {
@@ -165,16 +168,29 @@ namespace test_panel {
         return std::make_tuple(max_translational_velocity_, max_rotational_velocity_);
     }
 
-    void JoystickWidget::setMaxVelocities(float max_translational_velocity, float max_rotational_velocity) {
+    bool JoystickWidget::setMaxTransVelocities(float max_translational_velocity) {
+        if (max_translational_velocity < 0.0) {
+            return false;
+        }
+
         max_translational_velocity_ = max_translational_velocity;
-        max_rotational_velocity_ = max_rotational_velocity;
+        return true;
     }
 
-    void JoystickWidget::setReturnToZero(bool return_to_zero) {
-        return_to_zero_ = return_to_zero;
+    bool JoystickWidget::setMaxRotVelocities(float max_rotational_velocity) {
+        if (max_rotational_velocity < 0.0) {
+            return false;
+        }
+
+        max_rotational_velocity_ = max_rotational_velocity;
+        return true;
     }
 
     bool JoystickWidget::getReturnToZero() {
         return return_to_zero_;
+    }
+
+    void JoystickWidget::setReturnToZero(bool return_to_zero) {
+        return_to_zero_ = return_to_zero;
     }
 }

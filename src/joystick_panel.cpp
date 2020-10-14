@@ -8,8 +8,8 @@
  * This library is licensed under the MIT License
  **********************************************************************************************/
 
-#include "include/test_panel/joystick_panel.hpp"
-#include "include/test_panel/joystick_widget.hpp"
+#include "include/joystick_panel/joystick_panel.hpp"
+#include "include/joystick_panel/joystick_widget.hpp"
 
 #include <iostream>
 #include <QLineEdit>
@@ -21,7 +21,7 @@
 #include <QString>
 
 
-namespace test_panel {
+namespace joystick_panel {
 
     JoystickPanel::JoystickPanel(QWidget* parent) :
         Panel(parent), topic_("/cmd_vel") {
@@ -78,20 +78,34 @@ namespace test_panel {
         Panel::load(config);
         QString topic;
         if (config.mapGetString("Topic", &topic)) {
-            if (!topic.isEmpty()) {
-                topic_gui_->setText(topic);
-                setTopic(topic.toStdString());
-            }
+            topic_gui_->setText(topic);
+            updateTopic();
+        }
+        QString max_trans_velocity;
+        if (config.mapGetString("max_translational_velocity", &max_trans_velocity)) {
+            max_translational_velocity_gui_->setText(max_trans_velocity);
+            updateMaxTranslationalVelocity();
+        }
+        QString max_rot_velocity;
+        if (config.mapGetString("max_rotational_velocity", &max_rot_velocity)) {
+            max_rotational_velocity_gui_->setText(max_rot_velocity);
+            updateMaxRotationalVelocity();
+        }
+        QString is_return_to_zero;
+        if (config.mapGetString("return_to_zero", &is_return_to_zero)) {
+            return_to_zero_gui_->setChecked(is_return_to_zero == "false" ? false : true);
+            updateReturnToZero();
         }
     }
 
     void JoystickPanel::save(rviz_common::Config config) const {
         Panel::save(config);
         config.mapSetValue("Topic", QString::fromStdString(topic_));
-        // config.mapSetValue("max_translational_velocity", max_translational_velocity_);
-        // config.mapSetValue("max_rotational_velocity", max_rotational_velocity_);
-        // config.mapSetValue("return_to_zero", return_to_zero_);
-        // TODO
+        auto max_vels = joystick_widget_->getMaxVelocities();
+        config.mapSetValue("max_translational_velocity", QString::number(std::get<0>(max_vels), 'f', 2));
+        config.mapSetValue("max_rotational_velocity", QString::number(std::get<1>(max_vels), 'f', 2));
+        bool is_return_to_zero = joystick_widget_->getReturnToZero();
+        config.mapSetValue("return_to_zero", is_return_to_zero ? "true" : "false");
     }
 
     void JoystickPanel::publishVelocities() {
@@ -103,31 +117,43 @@ namespace test_panel {
     }
 
     void JoystickPanel::updateTopic() {
-        setTopic(topic_gui_->text().toStdString());
+        if (!setTopic(topic_gui_->text().toStdString())) {
+            topic_gui_->setText(QString::fromStdString(topic_));
+        }
     }
 
     void JoystickPanel::updateMaxTranslationalVelocity() {
-        // TODO
-        // joystick_widget_.setMaxVelocities()
+        bool ok;
+        float max_trans_vel = max_translational_velocity_gui_->text().toFloat(&ok);
+        if (!ok || !joystick_widget_->setMaxTransVelocities(max_trans_vel)) {
+            auto max_vels = joystick_widget_->getMaxVelocities();
+            max_translational_velocity_gui_->setText(QString::number(std::get<0>(max_vels), 'f', 2));
+        }
     }
 
     void JoystickPanel::updateMaxRotationalVelocity() {
-        // TODO: how to read float
-        // joystick_widget_.setMaxVelocities()
+        bool ok;
+        float max_rot_vel = max_rotational_velocity_gui_->text().toFloat(&ok);
+        if (!ok || !joystick_widget_->setMaxRotVelocities(max_rot_vel)) {
+            auto max_vels = joystick_widget_->getMaxVelocities();
+            max_rotational_velocity_gui_->setText(QString::number(std::get<1>(max_vels), 'f', 2));
+        }
     }
 
     void JoystickPanel::updateReturnToZero() {
-        std::cout << return_to_zero_gui_->isChecked() << std::endl;
         joystick_widget_->setReturnToZero(return_to_zero_gui_->isChecked());
     }
 
-    void JoystickPanel::setTopic(const std::string& topic) {
-        if (topic != "") {
-            topic_ = topic;
-            twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+    bool JoystickPanel::setTopic(const std::string& topic) {
+        if (topic == "" || isdigit(topic[0]) || topic[topic.length()-1] == '/') {
+            return false;
         }
+
+        topic_ = topic;
+        twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+        return true;
     }
 }
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(test_panel::JoystickPanel, rviz_common::Panel)
+PLUGINLIB_EXPORT_CLASS(joystick_panel::JoystickPanel, rviz_common::Panel)

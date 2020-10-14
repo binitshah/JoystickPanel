@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>test_panel</name>
+  <name>joystick_panel</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>A Rviz2 panel widget allowing simple diff-drive style robot base control.</description>
   <maintainer email="bshah@ieee.org">binitshah</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>

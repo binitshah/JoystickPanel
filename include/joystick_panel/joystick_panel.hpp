@@ -18,7 +18,7 @@
 class QLineEdit;
 class QCheckBox;
 
-namespace test_panel {
+namespace joystick_panel {
 
     class JoystickWidget;
 
@@ -53,8 +53,9 @@ namespace test_panel {
              * to set the topic name at which to publish the Twist msg.
              *
              * @param topic a string representing the topic name
+             * @return bool whether the given topic param is valid
              */
-            void setTopic(const std::string& topic);
+            bool setTopic(const std::string& topic);
 
         protected Q_SLOTS:
 

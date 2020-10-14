@@ -1,9 +1,9 @@
-<library path="test_panel">
-    <class name="test_panel/Joystick"
-           type="test_panel::JoystickPanel"
+<library path="joystick_panel">
+    <class name="joystick_panel/Joystick"
+           type="joystick_panel::JoystickPanel"
            base_class_type="rviz_common::Panel">
         <description>
-            A panel widget allowing simple diff-drive style robot base control.
+            A Rviz2 panel widget allowing simple diff-drive style robot base control.
         </description>
     </class>
 </library>
