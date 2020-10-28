@@ -1,9 +1,8 @@
 /**********************************************************************************************
- * Joystick panel - Version 0.0.0
+ * Joystick Widget - Version 0.0.0
  * by Binit shah <bshah@ieee.org>
  *
- * Rviz2 panel to control differential drive robots using a joystick,
- * with configurable topic name, maximum velocities, and zero-ing behavior.
+ * Rviz2 TODO.
  *
  * This library is licensed under the MIT License
  **********************************************************************************************/

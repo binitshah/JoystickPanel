@@ -1,9 +1,8 @@
 /**********************************************************************************************
- * Joystick panel - Version 0.0.0
+ * Joystick Widget - Version 0.0.0
  * by Binit shah <bshah@ieee.org>
  *
- * Rviz2 panel to control differential drive robots using a joystick,
- * with configurable topic name, maximum velocities, and zero-ing behavior.
+ * Rviz2 TODO.
  *
  * This library is licensed under the MIT License
  **********************************************************************************************/
@@ -63,7 +62,7 @@ namespace joystick_panel {
         translational_velocity_ = (-(pos_.y() - boundary.center().y()) / (float)outer_radius) * max_translational_velocity_;
     }
 
-    void JoystickWidget::paintEvent(QPaintEvent* event) {
+    void JoystickWidget::paintEvent(QPaintEvent* event __attribute__((unused))) {
         QPainter painter(this);
 
         // Calculate widget boundary
@@ -134,7 +133,7 @@ namespace joystick_panel {
         update();
     }
 
-    void JoystickWidget::mouseReleaseEvent(QMouseEvent* event) {
+    void JoystickWidget::mouseReleaseEvent(QMouseEvent* event __attribute__((unused))) {
         mouse_pressed_ = false;
     }
 
