@@ -18,6 +18,16 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
+# Include Qt5 libs per OS
+if(WIN32) # TODO: Windows build fails due to https://github.com/ros2/rviz/issues/601
+  list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.0/msvc2019_64")
+elseif(APPLE AND (EXISTS "/usr/local/opt/qt" OR EXISTS "/usr/local/opt/qt5"))
+  list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
+  list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
+else()
+  message(FATAL_ERROR "Please install Qt5")
+endif()
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
