@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -Wno-reorder-ctor)
+  add_compile_options(-Wall -Wextra -Wpedantic -Wno-reorder-ctor -Wno-reorder)
 endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
