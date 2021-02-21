@@ -58,7 +58,7 @@ namespace joystick_panel {
             update();
         }
 
-        rotational_velocity_ = ((pos_.x() - boundary.center().x()) / (float)outer_radius) * max_rotational_velocity_;
+        rotational_velocity_ = (-(pos_.x() - boundary.center().x()) / (float)outer_radius) * max_rotational_velocity_;
         translational_velocity_ = (-(pos_.y() - boundary.center().y()) / (float)outer_radius) * max_translational_velocity_;
     }
 
