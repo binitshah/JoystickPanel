@@ -58,8 +58,13 @@ namespace joystick_panel {
             update();
         }
 
-        rotational_velocity_ = (-(pos_.x() - boundary.center().x()) / (float)outer_radius) * max_rotational_velocity_;
-        translational_velocity_ = (-(pos_.y() - boundary.center().y()) / (float)outer_radius) * max_translational_velocity_;
+        int dx = pos_.x() - boundary.center().x();
+        int dy = pos_.y() - boundary.center().y();
+        float dist = std::pow(std::pow(dx, 2) + std::pow(dy, 2), 0.5);
+        float V = (dist / (float)outer_radius);
+        float theta = std::atan2(dy, dx);
+        translational_velocity_ = -V * std::sin(theta) * max_translational_velocity_;
+        rotational_velocity_ = -V * std::cos(theta) * max_rotational_velocity_;
     }
 
     void JoystickWidget::paintEvent(QPaintEvent* event __attribute__((unused))) {
