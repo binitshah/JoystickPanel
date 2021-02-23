@@ -51,12 +51,14 @@ namespace joystick_panel {
         max_rotational_velocity_gui_->setText(QString::number(std::get<1>(max_vels), 'f', 2));
         max_vels_layout->addWidget(max_rotational_velocity_gui_);
 
+        QHBoxLayout* checkboxes_layout = new QHBoxLayout;
         return_to_zero_gui_ = new QCheckBox("Return to Zero");
         return_to_zero_gui_->setChecked(is_return_to_zero);
+        checkboxes_layout->addWidget(return_to_zero_gui_);
         // return_to_zero_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
-
         enabled_gui_ = new QCheckBox("Enabled");
         enabled_gui_->setChecked(is_enabled);
+        checkboxes_layout->addWidget(enabled_gui_);
         // enabled_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
 
         QVBoxLayout* panel_layout = new QVBoxLayout;
@@ -64,8 +66,7 @@ namespace joystick_panel {
         panel_layout->addWidget(joystick_widget_);
         panel_layout->addLayout(topic_layout);
         panel_layout->addLayout(max_vels_layout);
-        panel_layout->addWidget(return_to_zero_gui_);
-        panel_layout->addWidget(enabled_gui_);
+        panel_layout->addLayout(checkboxes_layout);
         setLayout(panel_layout);
 
         // Setup panel functionality
