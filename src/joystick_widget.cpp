@@ -23,7 +23,7 @@ namespace joystick_panel {
     JoystickWidget::JoystickWidget(QWidget* parent) :
         QWidget(parent), max_translational_velocity_(5.0), max_rotational_velocity_(2.0),
         translational_velocity_(0.0), rotational_velocity_(0.0),
-        mouse_pressed_(false), return_to_zero_(true) {
+        mouse_pressed_(false), return_to_zero_(true), enabled_(false) {
         QTimer* calculation_timer = new QTimer(this);
         connect(calculation_timer, SIGNAL(timeout()), this, SLOT(calculateVelocities()));
         calculation_timer->start(10); // 0.01 seconds
@@ -191,5 +191,13 @@ namespace joystick_panel {
 
     void JoystickWidget::setReturnToZero(bool return_to_zero) {
         return_to_zero_ = return_to_zero;
+    }
+
+    bool JoystickWidget::getEnabled() {
+        return enabled_;
+    }
+
+    void JoystickWidget::setEnabled(bool enabled) {
+        enabled_ = enabled;
     }
 }

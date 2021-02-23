@@ -51,6 +51,12 @@ namespace joystick_panel {
 
             /*
              * A public method for others building on this panel
+             * to set whether the joystick widget is enabled.
+             */
+            bool getEnabled();
+
+            /*
+             * A public method for others building on this panel
              * to set the maximum vels that the joystick widget can
              * reach set for publishing in the Twist msg.
              *
@@ -74,9 +80,17 @@ namespace joystick_panel {
              * to set whether the joystick widget returns to
              * zero after being released.
              *
-             * @param return_to_zero_ whether or not to go to zero
+             * @param return_to_zero whether or not to go to zero
              */
             void setReturnToZero(bool return_to_zero);
+
+            /*
+             * A public method for others building on this panel
+             * to set whether the joystick widget is enabled.
+             *
+             * @param enabled whether or not the widget is enabled
+             */
+            void setEnabled(bool enabled);
 
         protected Q_SLOTS:
             void calculateVelocities();
@@ -87,6 +101,7 @@ namespace joystick_panel {
             QPoint pos_;
             bool mouse_pressed_;
             bool return_to_zero_;
+            bool enabled_;
             QPoint last_error_;
             float max_translational_velocity_; // m/s
             float max_rotational_velocity_; // rad/s

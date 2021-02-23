@@ -33,6 +33,7 @@ namespace joystick_panel {
         joystick_widget_ = new JoystickWidget;
         auto max_vels = joystick_widget_->getMaxVelocities();
         bool is_return_to_zero = joystick_widget_->getReturnToZero();
+        bool is_enabled = joystick_widget_->getEnabled();
 
         QHBoxLayout* topic_layout = new QHBoxLayout;
         topic_layout->addWidget(new QLabel("Topic: "));
@@ -54,12 +55,17 @@ namespace joystick_panel {
         return_to_zero_gui_->setChecked(is_return_to_zero);
         // return_to_zero_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
 
+        enabled_gui_ = new QCheckBox("Enabled");
+        enabled_gui_->setChecked(is_enabled);
+        // enabled_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
+
         QVBoxLayout* panel_layout = new QVBoxLayout;
-        panel_layout->addWidget(new QLabel("Use arrow keys or mouse. Press 'space' to stop."));
+        panel_layout->addWidget(new QLabel("Use mouse to move joystick. Enable/Disable with checkbox."));
         panel_layout->addWidget(joystick_widget_);
         panel_layout->addLayout(topic_layout);
         panel_layout->addLayout(max_vels_layout);
         panel_layout->addWidget(return_to_zero_gui_);
+        panel_layout->addWidget(enabled_gui_);
         setLayout(panel_layout);
 
         // Setup panel functionality
@@ -69,6 +75,7 @@ namespace joystick_panel {
         connect(max_translational_velocity_gui_, SIGNAL(editingFinished()), this, SLOT(updateMaxTranslationalVelocity()));
         connect(max_rotational_velocity_gui_, SIGNAL(editingFinished()), this, SLOT(updateMaxRotationalVelocity()));
         connect(return_to_zero_gui_, SIGNAL(toggled(bool)), this, SLOT(updateReturnToZero()));
+        connect(enabled_gui_, SIGNAL(toggled(bool)), this, SLOT(updateEnabled()));
         connect(publish_timer, SIGNAL(timeout()), this, SLOT(publishVelocities()));
 
         publish_timer->start(100); // 0.1 seconds
@@ -96,6 +103,11 @@ namespace joystick_panel {
             return_to_zero_gui_->setChecked(is_return_to_zero == "false" ? false : true);
             updateReturnToZero();
         }
+        QString is_enabled;
+        if (config.mapGetString("enabled", &is_enabled)) {
+            enabled_gui_->setChecked(is_enabled == "false" ? false : true);
+            updateEnabled();
+        }
     }
 
     void JoystickPanel::save(rviz_common::Config config) const {
@@ -106,14 +118,18 @@ namespace joystick_panel {
         config.mapSetValue("max_rotational_velocity", QString::number(std::get<1>(max_vels), 'f', 2));
         bool is_return_to_zero = joystick_widget_->getReturnToZero();
         config.mapSetValue("return_to_zero", is_return_to_zero ? "true" : "false");
+        bool is_enabled = joystick_widget_->getEnabled();
+        config.mapSetValue("enabled", is_enabled ? "true" : "false");
     }
 
     void JoystickPanel::publishVelocities() {
-        geometry_msgs::msg::Twist msg;
-        auto vels = joystick_widget_->getVelocities();
-        msg.linear.x = std::get<0>(vels);
-        msg.angular.z = std::get<1>(vels);
-        twist_publisher_->publish(msg);
+        if (joystick_widget_->getEnabled()) {
+            geometry_msgs::msg::Twist msg;
+            auto vels = joystick_widget_->getVelocities();
+            msg.linear.x = std::get<0>(vels);
+            msg.angular.z = std::get<1>(vels);
+            twist_publisher_->publish(msg);
+        }
     }
 
     void JoystickPanel::updateTopic() {
@@ -142,6 +158,10 @@ namespace joystick_panel {
 
     void JoystickPanel::updateReturnToZero() {
         joystick_widget_->setReturnToZero(return_to_zero_gui_->isChecked());
+    }
+
+    void JoystickPanel::updateEnabled() {
+        joystick_widget_->setEnabled(enabled_gui_->isChecked());
     }
 
     bool JoystickPanel::setTopic(const std::string& topic) {

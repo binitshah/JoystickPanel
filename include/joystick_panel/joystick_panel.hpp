@@ -89,6 +89,12 @@ namespace joystick_panel {
              */
             void updateReturnToZero();
 
+            /*
+             * The GUI's callback for updating the enabled
+             * checkbox.
+             */
+            void updateEnabled();
+
         protected:
             // Panel vars
             JoystickWidget* joystick_widget_;
@@ -96,6 +102,7 @@ namespace joystick_panel {
             QLineEdit* max_translational_velocity_gui_;
             QLineEdit* max_rotational_velocity_gui_;
             QCheckBox* return_to_zero_gui_;
+            QCheckBox* enabled_gui_;
             std::string topic_;
 
             // ROS2 vars
