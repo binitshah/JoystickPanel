@@ -28,12 +28,15 @@ namespace joystick_panel {
         // Setup ROS2 functionality
         node_ = rclcpp::Node::make_shared("joystick_panel");
         twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+        std::string stamped_topic = topic_ + "_stamped";
+        stamped_publisher_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(stamped_topic, 10);
 
         // Layout the panel
         joystick_widget_ = new JoystickWidget;
         auto max_vels = joystick_widget_->getMaxVelocities();
         bool is_return_to_zero = joystick_widget_->getReturnToZero();
         bool is_enabled = joystick_widget_->getEnabled();
+        bool is_stamped = joystick_widget_->getStamped();
 
         QHBoxLayout* topic_layout = new QHBoxLayout;
         topic_layout->addWidget(new QLabel("Topic: "));
@@ -59,6 +62,10 @@ namespace joystick_panel {
         enabled_gui_ = new QCheckBox("Enabled");
         enabled_gui_->setChecked(is_enabled);
         checkboxes_layout->addWidget(enabled_gui_);
+
+        stamped_gui_ = new QCheckBox("Stamped Twist");
+        stamped_gui_->setChecked(is_stamped);
+        checkboxes_layout->addWidget(stamped_gui_);
         // enabled_gui_->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum) );
 
         QVBoxLayout* panel_layout = new QVBoxLayout;
@@ -77,6 +84,7 @@ namespace joystick_panel {
         connect(max_rotational_velocity_gui_, SIGNAL(editingFinished()), this, SLOT(updateMaxRotationalVelocity()));
         connect(return_to_zero_gui_, SIGNAL(toggled(bool)), this, SLOT(updateReturnToZero()));
         connect(enabled_gui_, SIGNAL(toggled(bool)), this, SLOT(updateEnabled()));
+        connect(stamped_gui_, SIGNAL(toggled(bool)), this, SLOT(updateStamped()));
         connect(publish_timer, SIGNAL(timeout()), this, SLOT(publishVelocities()));
 
         publish_timer->start(100); // 0.1 seconds
@@ -109,6 +117,11 @@ namespace joystick_panel {
             enabled_gui_->setChecked(is_enabled == "false" ? false : true);
             updateEnabled();
         }
+        QString is_stamped;
+        if (config.mapGetString("stamped", &is_stamped)) {
+            stamped_gui_->setChecked(is_stamped == "false" ? false : true);
+            updateStamped();
+        }
     }
 
     void JoystickPanel::save(rviz_common::Config config) const {
@@ -121,6 +134,8 @@ namespace joystick_panel {
         config.mapSetValue("return_to_zero", is_return_to_zero ? "true" : "false");
         bool is_enabled = joystick_widget_->getEnabled();
         config.mapSetValue("enabled", is_enabled ? "true" : "false");
+        bool is_stamped = joystick_widget_->getStamped();
+        config.mapSetValue("stamped", is_stamped ? "true" : "false");
     }
 
     void JoystickPanel::publishVelocities() {
@@ -129,6 +144,15 @@ namespace joystick_panel {
             auto vels = joystick_widget_->getVelocities();
             msg.linear.x = std::get<0>(vels);
             msg.angular.z = std::get<1>(vels);
+
+            if (joystick_widget_->getStamped()) {
+                geometry_msgs::msg::TwistStamped stamped_msg;
+                stamped_msg.header.stamp = node_->get_clock()->now();
+                stamped_msg.twist.linear.x = msg.linear.x;
+                stamped_msg.twist.angular.z = msg.angular.z;
+                stamped_publisher_->publish(stamped_msg);
+            }
+
             twist_publisher_->publish(msg);
         }
     }
@@ -165,13 +189,23 @@ namespace joystick_panel {
         joystick_widget_->setEnabled(enabled_gui_->isChecked());
     }
 
+    void JoystickPanel::updateStamped() {
+        joystick_widget_->setStamped(stamped_gui_->isChecked());
+
+        setTopic(topic_);
+    }
+
     bool JoystickPanel::setTopic(const std::string& topic) {
         if (topic == "" || isdigit(topic[0]) || topic[topic.length()-1] == '/') {
             return false;
         }
 
         topic_ = topic;
+
         twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+        std::string stamped_topic = topic_ + "_stamped";
+        stamped_publisher_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(stamped_topic, 10);
+
         return true;
     }
 }

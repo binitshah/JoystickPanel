@@ -57,6 +57,12 @@ namespace joystick_panel {
 
             /*
              * A public method for others building on this panel
+             * to set whether the topic is publishing stamped twist messages
+             */
+            bool getStamped();
+
+            /*
+             * A public method for others building on this panel
              * to set the maximum vels that the joystick widget can
              * reach set for publishing in the Twist msg.
              *
@@ -92,6 +98,14 @@ namespace joystick_panel {
              */
             void setEnabled(bool enabled);
 
+            /*
+             * A public method for others building on this panel
+             * to set whether the joystick widget publishes TwistStamped messages
+             *
+             * @param enabled whether or not the widget publishes stamped messages
+             */
+            void setStamped(bool enabled);
+
         protected Q_SLOTS:
             void calculateVelocities();
 
@@ -102,6 +116,7 @@ namespace joystick_panel {
             bool mouse_pressed_;
             bool return_to_zero_;
             bool enabled_;
+            bool stamped_;
             QPoint last_error_;
             float max_translational_velocity_; // m/s
             float max_rotational_velocity_; // rad/s
