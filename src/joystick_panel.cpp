@@ -151,9 +151,9 @@ namespace joystick_panel {
                 stamped_msg.twist.linear.x = msg.linear.x;
                 stamped_msg.twist.angular.z = msg.angular.z;
                 stamped_publisher_->publish(stamped_msg);
-            } else {
-                twist_publisher_->publish(msg);
             }
+
+            twist_publisher_->publish(msg);
         }
     }
 
