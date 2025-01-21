@@ -13,6 +13,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 
 class QLineEdit;
@@ -61,13 +62,13 @@ namespace joystick_panel {
 
             /*
              * Uses the ROS2 publisher to publish a
-             * geometry_msgs/TwistStamped.msg.
+             * geometry_msgs/Twist.msg.
              */
             void publishVelocities();
 
             /*
              * The GUI's callback for updating the topic name at
-             * which to publish the TwistStamped msg.
+             * which to publish the Twist msg.
              */
             void updateTopic();
 
@@ -95,6 +96,12 @@ namespace joystick_panel {
              */
             void updateEnabled();
 
+            /*
+             * The GUI's callback for updating the stamped
+             * checkbox.
+             */
+            void updateStamped();
+
         protected:
             // Panel vars
             JoystickWidget* joystick_widget_;
@@ -103,11 +110,13 @@ namespace joystick_panel {
             QLineEdit* max_rotational_velocity_gui_;
             QCheckBox* return_to_zero_gui_;
             QCheckBox* enabled_gui_;
+            QCheckBox* stamped_gui_;
             std::string topic_;
 
             // ROS2 vars
             std::shared_ptr<rclcpp::Node> node_;
-            std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::TwistStamped>> twist_publisher_;
+            std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::Twist>> twist_publisher_;
+            std::shared_ptr<rclcpp::Publisher<geometry_msgs::msg::TwistStamped>> stamped_publisher_;
     };
 }
 
