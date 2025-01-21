@@ -27,7 +27,7 @@ namespace joystick_panel {
         Panel(parent), topic_("/cmd_vel") {
         // Setup ROS2 functionality
         node_ = rclcpp::Node::make_shared("joystick_panel");
-        twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+        twist_publisher_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(topic_, 10);
 
         // Layout the panel
         joystick_widget_ = new JoystickWidget;
@@ -125,10 +125,11 @@ namespace joystick_panel {
 
     void JoystickPanel::publishVelocities() {
         if (joystick_widget_->getEnabled()) {
-            geometry_msgs::msg::Twist msg;
+            geometry_msgs::msg::TwistStamped msg;
+            msg.header.stamp = node_->get_clock()->now();
             auto vels = joystick_widget_->getVelocities();
-            msg.linear.x = std::get<0>(vels);
-            msg.angular.z = std::get<1>(vels);
+            msg.twist.linear.x = std::get<0>(vels);
+            msg.twist.angular.z = std::get<1>(vels);
             twist_publisher_->publish(msg);
         }
     }
@@ -171,7 +172,7 @@ namespace joystick_panel {
         }
 
         topic_ = topic;
-        twist_publisher_ = node_->create_publisher<geometry_msgs::msg::Twist>(topic_, 10);
+        twist_publisher_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(topic_, 10);
         return true;
     }
 }
